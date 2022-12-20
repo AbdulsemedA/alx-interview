@@ -14,10 +14,10 @@ def pascal_triangle(n):
     for i in range(n):
         #create a list inside list1
         list1.append([])
-        #append first 1   
-        list1[i].append(1)  
-        for j in range(1, i):  
-            list1[i].append(list1[i - 1][j - 1] + list1[i - 1][j])  
-        if(i != 0):  
+        #append first 1
+        list1[i].append(1)
+        for j in range(1, i):
+            list1[i].append(list1[i - 1][j - 1] + list1[i - 1][j])
+        if(i != 0):
             list1[i].append(1)
     return list1
