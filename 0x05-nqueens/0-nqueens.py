@@ -1,72 +1,111 @@
 #!/usr/bin/python3
 """
-Module 0-nqueens
-A program that solves the N queens problem
+Contains methods that find the possible solutions to the n-queens can
+be placed without them attacking each other(The n-queens problem).
 """
 import sys
 
-if len(sys.argv) < 2:
-    print("Usage: nqueens N")
-    sys.exit(1)
 
-try:
-    num = int(sys.argv[1])
-except ValueError:
-    print("N must be a number")
-    sys.exit(1)
+def is_valid(board, row, col):
+    """
+    Checks if a position of the queen is valid
 
-if not (num >= 4):
-    print("N must be at least 4")
-    sys.exit(1)
+    Args:
+        board: 2D array representing the board
+        row: row of the queen
+        col: column of the queen
+
+    Returns:
+        Boolean: True if the position is valid, False otherwise
+    """
+    # Check this row on left side
+    if 1 in board[row]:
+        return False
+
+    upper_diag = zip(range(row, -1, -1),
+                     range(col, -1, -1))
+    for i, j in upper_diag:
+        if board[i][j] == 1:
+            return False
+
+    lower_diag = zip(range(row, len(board), 1),
+                     range(col, -1, -1))
+    for i, j in lower_diag:
+        if board[i][j] == 1:
+            return False
+
+    return True
 
 
-def solveNQueens(n):
-    """Solution for n queens"""
-    col = set()  # keep track of used columns
-    pos = set()  # (r + c) keep track of used positive diagonals
-    neg = set()  # (r - c) keep track of used negative diagonals
+def nqueens_helper(board, col):
+    """
+    Helper function for nqueens
 
-    res = []  # final result
+    Args:
+        board: 2D array representing the board
+        col: column to start from
 
-    board = [[] for n in range(n)]  # create empy board
+    Returns:
+        Boolean: True if a solution is found, False otherwise
+    """
+    if col >= len(board):
+        print_board(board, len(board))
+    for i in range(len(board)):
+        if is_valid(board, i, col):
+            board[i][col] = 1
+            result = nqueens_helper(board, col + 1)
+            if result:
+                return True
+            board[i][col] = 0
+    return False
 
-    def backtrack(row):
-        """function for recursion"""
-        # means we've reached the last row
-        if row == n:
-            # get copy of current solution(current board)
-            copy = board.copy()
-            res.append(copy)
-            return
 
-        # for every column
-        for c in range(n):
-            # if we find that the column or diagonals are used, then skip
-            if c in col or (row + c) in pos or (row - c) in neg:
-                continue
+def print_board(board, n):
+    """
+    Prints positions of the queens
 
-            # register found columns and diagonals
-            col.add(c)
-            pos.add(row + c)
-            neg.add(row - c)
+    Args:
+        board: 2D array representing the board
+        n: size of the board
 
-            board[row] = [row, c]
+    Returns:
+        None
+    """
+    b = []
 
-            # move to next row
-            backtrack(row + 1)
+    for i in range(n):
+        for j in range(n):
+            if board[i][j] == 1:
+                b.append([i, j])
+    print(b)
 
-            # finally undo
-            col.remove(c)
-            pos.remove(row + c)
-            neg.remove(row - c)
-            board[row] = []
 
-    backtrack(0)
+def nqueens(n):
+    """
+    Finds all possible solutions to the n-queens problem
 
-    return res
+    Args:
+        n: size of the board
+
+    Returns:
+        None
+    """
+    board = []
+    for i in range(n):
+        row = [0] * n
+        board.append(row)
+    nqueens_helper(board, 0)
 
 
 if __name__ == "__main__":
-    boards = solveNQueens(num)
-    for board in boards:
-        print(board)
+    if len(sys.argv) != 2:
+        print("Usage: nqueens N")
+        exit(1)
+    queens = sys.argv[1]
+    if not queens.isnumeric():
+        print("N must be a number")
+        exit(1)
+    elif int(queens) < 4:
+        print("N must be at least 4")
+        exit(1)
+    nqueens(int(queens))
