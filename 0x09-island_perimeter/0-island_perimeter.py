@@ -1,38 +1,26 @@
 #!/usr/bin/python3
-"""
-Module 0-island_perimeter
-"""
+
+""" Function to find perimiter of an island """
 
 
 def island_perimeter(grid):
     """
-    Determines the perimeter of
-    an island
+    Input: List of Lists
+    Returns: Perimeter of the island
     """
-    visited = set()
-
-    if not grid:
-        return 0
-
-    def dfs(i, j):
-        """depth first search"""
-        if (i, j) in visited:
-            return 0
-        if i >= len(grid) or\
-                j >= len(grid[0]) or\
-                i < 0 or j < 0 or\
-                grid[i][j] == 0:
-            return 1
-        visited.add((i, j))
-        result = dfs(i, j + 1)
-        result += dfs(i, j - 1)
-        result += dfs(i + 1, j)
-        result += dfs(i - 1, j)
-        return result
+    count = 0
+    row = len(grid)
+    col = len(grid[0]) if row else 0
 
     for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            # do a dfs for only land
+        for j in range(len(grid[i])):
+
+            idx = [(i - 1, j), (i, j - 1), (i, j + 1), (i + 1, j)]
+            check = [1 if k[0] in range(row) and k[1] in range(col) else 0
+                     for k in idx]
+
             if grid[i][j]:
-                return dfs(i, j)
-    return 0
+                count += sum([1 if not r or not grid[k[0]][k[1]] else 0
+                              for r, k in zip(check, idx)])
+
+    return (count)

@@ -1,36 +1,36 @@
 #!/usr/bin/node
+const argv = process.argv;
+const urlFilm = 'https://swapi-api.hbtn.io/api/films/';
+const urlMovie = `${urlFilm}${argv[2]}/`;
+
 const request = require('request');
 
-const filmId = process.argv[2];
+request(urlMovie, function (error, response, body) {
+  if (error == null) {
+    const fbody = JSON.parse(body);
+    const characters = fbody.characters;
 
-const url = 'https://swapi-api.hbtn.io/api/films/' + filmId + '/';
-
-function printMovieCharacters (url) {
-  request(url, async function (error, response, body) {
-    if (error) return console.log('An error occurred');
-
-    const characters = JSON.parse(body).characters;
-    if (!characters) return;
-
-    const promises = [];
-
-    for (const ch of characters) {
-      let promise = null;
-
-      promise = new Promise(function (resolve, reject) {
-        request(ch, function (error, response, body) {
-          if (error) return console.log('Error fetching character');
-          resolve(JSON.parse(body).name);
-        });
-      });
-      promises.push(promise);
+    if (characters && characters.length > 0) {
+      const limit = characters.length;
+      CharRequest(0, characters[0], characters, limit);
     }
+  } else {
+    console.log(error);
+  }
+});
 
-    const data = await Promise.all(promises);
-    for (const item of data) {
-      console.log(item);
+function CharRequest (idx, url, characters, limit) {
+  if (idx === limit) {
+    return;
+  }
+  request(url, function (error, response, body) {
+    if (!error) {
+      const rbody = JSON.parse(body);
+      console.log(rbody.name);
+      idx++;
+      CharRequest(idx, characters[idx], characters, limit);
+    } else {
+      console.error('error:', error);
     }
   });
 }
-
-printMovieCharacters(url);
